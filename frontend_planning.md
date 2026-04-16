@@ -1648,3 +1648,5 @@ flowchart TD
 ---
 
 > **Catatan Akhir:** Dokumen ini bersifat *living document* — akan diperbarui seiring berkembangnya kebutuhan dan feedback dari tim. Semua business logic kritis (harga, validasi paket, clash detection) tetap harus divalidasi di sisi backend (Laravel) sebagai single source of truth.
+
+tes
