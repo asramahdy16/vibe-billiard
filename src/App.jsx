@@ -2,8 +2,15 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import AppRoutes from './routes/AppRoutes';
+import useAuthStore from './store/authStore';
 
 function App() {
+  const { checkAuth } = useAuthStore();
+
+  React.useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
   return (
     <BrowserRouter>
       <AppRoutes />

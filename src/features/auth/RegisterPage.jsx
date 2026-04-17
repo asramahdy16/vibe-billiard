@@ -2,15 +2,35 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
+import useAuthStore from '../../store/authStore';
 
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = React.useState(false);
+  const [formData, setFormData] = React.useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    password_confirmation: '',
+  });
+  
+  const { register, isLoading } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    toast.success('Pendaftaran berhasil! Silakan login.');
-    navigate('/login');
+    if (formData.password !== formData.password_confirmation) {
+      toast.error('Konfirmasi password tidak cocok!');
+      return;
+    }
+
+    try {
+      await register(formData);
+      toast.success('Pendaftaran berhasil! Selamat datang.');
+      navigate('/dashboard');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Pendaftaran gagal. Silakan coba lagi.');
+    }
   };
 
   return (
@@ -32,17 +52,38 @@ const RegisterPage = () => {
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Nama Lengkap</label>
-              <input type="text" required className="input-field" placeholder="John Doe" />
+              <input 
+                type="text" 
+                required 
+                className="input-field" 
+                placeholder="John Doe" 
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+              />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Email</label>
-              <input type="email" required className="input-field" placeholder="email@contoh.com" />
+              <input 
+                type="email" 
+                required 
+                className="input-field" 
+                placeholder="email@contoh.com" 
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+              />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">No. WhatsApp</label>
-              <input type="tel" required className="input-field" placeholder="0812xxxxxxxx" />
+              <input 
+                type="tel" 
+                required 
+                className="input-field" 
+                placeholder="0812xxxxxxxx" 
+                value={formData.phone}
+                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              />
             </div>
 
             <div>
@@ -53,6 +94,8 @@ const RegisterPage = () => {
                   required
                   className="input-field !pr-12"
                   placeholder="••••••••"
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
                 />
                 <button 
                   type="button"
@@ -64,8 +107,24 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            <button type="submit" className="btn-tertiary w-full !py-3.5 text-base mt-2">
-              DAFTAR SEKARANG
+            <div>
+              <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Konfirmasi Password</label>
+              <input 
+                type={showPassword ? "text" : "password"} 
+                required
+                className="input-field"
+                placeholder="••••••••"
+                value={formData.password_confirmation}
+                onChange={(e) => setFormData({...formData, password_confirmation: e.target.value})}
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              className="btn-tertiary w-full !py-3.5 text-base mt-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              disabled={isLoading}
+            >
+              {isLoading ? 'MENDAFTAR...' : 'DAFTAR SEKARANG'}
             </button>
           </form>
 

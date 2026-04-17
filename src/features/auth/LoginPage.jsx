@@ -8,18 +8,27 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [email, setEmail] = React.useState('user@contoh.com');
   const [password, setPassword] = React.useState('password123');
-  const { setAuth } = useAuthStore();
+  const { login, isLoading } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
       toast.error('Email dan Password wajib diisi!');
       return;
     }
-    toast.success('Login berhasil!');
-    setAuth({ id: 1, name: 'John Doe', email, role: 'customer' }, 'mock-jwt-token-12345');
-    navigate('/dashboard');
+    
+    try {
+      const data = await login({ email, password });
+      toast.success('Login berhasil!');
+      if (data.user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Login gagal. Periksa kembali email dan password Anda.');
+    }
   };
 
   return (
@@ -80,8 +89,12 @@ const LoginPage = () => {
               </div>
             </div>
 
-            <button type="submit" className="btn-primary w-full !py-3.5 text-base">
-              MASUK
+            <button 
+              type="submit" 
+              className="btn-primary w-full !py-3.5 text-base disabled:opacity-70 disabled:cursor-not-allowed"
+              disabled={isLoading}
+            >
+              {isLoading ? 'MEMPROSES...' : 'MASUK'}
             </button>
           </form>
 

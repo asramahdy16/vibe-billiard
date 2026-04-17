@@ -1,43 +1,35 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarCheck, ArrowRight } from 'lucide-react';
-
-const mockBookings = [
-  {
-    id: 'BK-20260416-001',
-    table: 'Meja 1',
-    date: '2026-04-16',
-    time: '14:00 - 16:00',
-    package: 'Paket Reguler',
-    total: 70000,
-    status: 'pending'
-  },
-  {
-    id: 'BK-20260415-052',
-    table: 'Meja 3',
-    date: '2026-04-15',
-    time: '10:00 - 12:00',
-    package: 'Paket Hemat',
-    total: 50000,
-    status: 'completed'
-  },
-  {
-    id: 'BK-20260414-033',
-    table: 'Meja 6',
-    date: '2026-04-14',
-    time: '19:00 - 21:00',
-    package: 'Paket Reguler',
-    total: 70000,
-    status: 'confirmed'
-  }
-];
+import * as bookingApi from '../../api/bookingApi';
+import { CalendarCheck, ArrowRight, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const MyBookingsPage = () => {
+  const [bookings, setBookings] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const data = await bookingApi.getMyBookings();
+        setBookings(data.data);
+      } catch (error) {
+        toast.error('Gagal mengambil riwayat pemesanan.');
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBookings();
+  }, []);
+
   const getStatusBadge = (status) => {
     const config = {
-      pending:   { bg: 'bg-primary/10', text: 'text-primary', border: 'border-primary/20', label: 'MENUNGGU' },
-      confirmed: { bg: 'bg-tertiary/10', text: 'text-tertiary', border: 'border-tertiary/20', label: 'DIKONFIRMASI' },
-      completed: { bg: 'bg-outline/10', text: 'text-on-surface-variant', border: 'border-outline/20', label: 'SELESAI' },
+      pending:     { bg: 'bg-primary/10', text: 'text-primary', border: 'border-primary/20', label: 'MENUNGGU' },
+      confirmed:   { bg: 'bg-tertiary/10', text: 'text-tertiary', border: 'border-tertiary/20', label: 'DIKONFIRMASI' },
+      in_progress: { bg: 'bg-secondary/10', text: 'text-secondary', border: 'border-secondary/20', label: 'BERMAIN' },
+      completed:   { bg: 'bg-outline/10', text: 'text-on-surface-variant', border: 'border-outline/20', label: 'SELESAI' },
+      cancelled:   { bg: 'bg-error/10', text: 'text-error', border: 'border-error/20', label: 'BATAL' },
     };
     const c = config[status] || config.pending;
     return (
@@ -46,6 +38,15 @@ const MyBookingsPage = () => {
       </span>
     );
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-20 min-h-[60vh]">
+        <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+        <p className="text-on-surface-variant font-medium">Memuat riwayat pemesanan...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto p-4 lg:p-8 py-8 pb-24 md:pb-8">
@@ -60,7 +61,7 @@ const MyBookingsPage = () => {
       </div>
 
       <div className="space-y-4">
-        {mockBookings.map((bk) => (
+        {bookings.map((bk) => (
           <div key={bk.id} className="card-elevated p-5 md:p-6 group hover:shadow-[0_10px_30px_-10px_rgba(0,40,93,0.3)] transition-all duration-500">
             <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 border-b border-outline-variant/10 pb-4 mb-4">
               <div className="flex items-center gap-4">
@@ -68,8 +69,8 @@ const MyBookingsPage = () => {
                   🎱
                 </div>
                 <div>
-                  <p className="text-on-surface-variant text-xs font-mono">#{bk.id}</p>
-                  <h3 className="font-bold text-xl text-on-surface">{bk.table}</h3>
+                  <p className="text-on-surface-variant text-xs font-mono">#BK-{bk.id.toString().padStart(6, '0')}</p>
+                  <h3 className="font-bold text-xl text-on-surface">{bk.table?.nama_meja || 'Meja'}</h3>
                 </div>
               </div>
               <div>{getStatusBadge(bk.status)}</div>
@@ -77,10 +78,10 @@ const MyBookingsPage = () => {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: 'Tanggal', value: bk.date },
-                { label: 'Waktu', value: bk.time },
-                { label: 'Paket', value: bk.package },
-                { label: 'Total', value: `Rp ${bk.total.toLocaleString('id-ID')}`, highlight: true },
+                { label: 'Tanggal', value: bk.tanggal },
+                { label: 'Waktu', value: `${bk.waktu_mulai} - ${bk.waktu_selesai}` },
+                { label: 'Paket', value: bk.package?.nama_paket || 'Reguler' },
+                { label: 'Total', value: `Rp ${Number(bk.total_harga).toLocaleString('id-ID')}`, highlight: true },
               ].map((item, i) => (
                 <div key={i}>
                   <p className="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">{item.label}</p>
@@ -98,7 +99,7 @@ const MyBookingsPage = () => {
           </div>
         ))}
 
-        {mockBookings.length === 0 && (
+        {bookings.length === 0 && (
           <div className="glass-panel rounded-2xl border border-outline-variant/10 text-center p-16">
             <CalendarCheck className="h-16 w-16 text-on-surface-variant/30 mx-auto mb-4" />
             <p className="text-on-surface-variant mb-4 text-lg">Belum ada riwayat pemesanan.</p>

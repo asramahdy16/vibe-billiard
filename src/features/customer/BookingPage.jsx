@@ -1,28 +1,44 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useBookingStore from '../../store/bookingStore';
+import * as tableApi from '../../api/tableApi';
 import TableCard from '../../components/booking/TableCard';
 import TimeSlotPicker from '../../components/booking/TimeSlotPicker';
 import PackageSelector from '../../components/booking/PackageSelector';
-import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
-
-const mockTables = [
-  { id: 1, name: 'Meja 1', status: 'available' },
-  { id: 2, name: 'Meja 2', status: 'booked' },
-  { id: 3, name: 'Meja 3', status: 'available' },
-  { id: 4, name: 'Meja 4', status: 'in_use' },
-  { id: 5, name: 'Meja 5', status: 'inactive' },
-  { id: 6, name: 'Meja 6', status: 'available' },
-];
+import { ArrowLeft, ArrowRight, CheckCircle, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const BookingPage = () => {
   const [step, setStep] = useState(1);
+  const [tables, setTables] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  
   const { 
     selectedTable, setTable, 
     selectedDate, startTime, setDateTime,
     selectedPackage, setPackage 
   } = useBookingStore();
+
+  React.useEffect(() => {
+    const fetchTables = async () => {
+      try {
+        const data = await tableApi.getTables();
+        // Map backend 'nama_meja' to frontend 'name' for TableCard component
+        const formattedTables = data.data.map(t => ({
+          ...t,
+          name: t.nama_meja
+        }));
+        setTables(formattedTables);
+      } catch (error) {
+        toast.error('Gagal mengambil data meja.');
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTables();
+  }, []);
 
   const [date, setDate] = useState(selectedDate ? new Date(selectedDate) : new Date());
   const [time, setTime] = useState(startTime || null);
@@ -31,7 +47,15 @@ const BookingPage = () => {
   const handleNextStep = () => {
     if (step === 1 && selectedTable) setStep(2);
     else if (step === 2 && date && time) {
-      setDateTime(date.toISOString(), time, `${parseInt(time.split(':')[0]) + duration}:00`);
+      const startHour = parseInt(time.split(':')[0]);
+      let endHour = startHour + duration;
+      let endTimeStr = `${endHour.toString().padStart(2, '0')}:00`;
+      
+      if (endHour >= 24) {
+        endTimeStr = '23:59';
+      }
+      
+      setDateTime(date.toISOString(), time, endTimeStr);
       setStep(3);
     }
     else if (step === 3 && selectedPackage) navigate('/booking/checkout');
@@ -81,11 +105,19 @@ const BookingPage = () => {
             <div>
               <h2 className="text-2xl font-bold text-on-surface mb-2">Pilih Meja yang Tersedia</h2>
               <p className="text-on-surface-variant text-sm mb-6">Meja dengan status hijau bisa langsung dipesan.</p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {mockTables.map(t => (
-                  <TableCard key={t.id} table={t} selected={selectedTable?.id === t.id} onSelect={setTable} />
-                ))}
-              </div>
+              
+              {loading ? (
+                <div className="flex flex-col items-center justify-center py-20 text-on-surface-variant">
+                  <Loader2 className="h-10 w-10 animate-spin mb-4 text-primary" />
+                  <p className="font-medium">Memuat data meja...</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {tables.map(t => (
+                    <TableCard key={t.id} table={t} selected={selectedTable?.id === t.id} onSelect={setTable} />
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

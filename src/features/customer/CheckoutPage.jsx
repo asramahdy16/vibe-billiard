@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useBookingStore from '../../store/bookingStore';
+import * as bookingApi from '../../api/bookingApi';
+import * as paymentApi from '../../api/paymentApi';
+import { Loader2, ArrowLeft, Wallet, Building2, Smartphone } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Wallet, Building2, Smartphone } from 'lucide-react';
 
 const CheckoutPage = () => {
-  const { selectedTable, selectedDate, startTime, endTime, selectedPackage, totalPrice } = useBookingStore();
+  const { selectedTable, selectedDate, startTime, endTime, selectedPackage, totalPrice, resetBooking } = useBookingStore();
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState('');
+  const [loading, setLoading] = useState(false);
 
   if (!selectedTable || !selectedPackage) {
     return (
@@ -22,13 +25,47 @@ const CheckoutPage = () => {
     );
   }
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!paymentMethod) {
       toast.error('Silakan pilih metode pembayaran');
       return;
     }
-    toast.success('Booking Berhasil Dikonfirmasi!');
-    navigate('/booking/success');
+
+    setLoading(true);
+    try {
+      // 1. Create Booking
+      const isoDate = new Date(selectedDate).toISOString().split('T')[0];
+      const bookingResp = await bookingApi.createBooking({
+        table_id: selectedTable.id,
+        package_id: selectedPackage.id,
+        tanggal: isoDate,
+        waktu_mulai: startTime,
+        waktu_selesai: endTime,
+        catatan: `Metode pembayaran: ${paymentMethod}`
+      });
+
+      const bookingId = bookingResp.data.id;
+
+      // 2. Create Payment Record
+      let metode = 'transfer';
+      if (paymentMethod.includes('Cash')) metode = 'cash';
+      else if (paymentMethod.includes('E-Wallet')) metode = 'ewallet';
+
+      await paymentApi.processPayment(bookingId, {
+        metode: metode,
+        bukti_transfer: null // Placeholder for now
+      });
+
+      toast.success('Pemesanan berhasil dibuat!');
+      
+      // Navigate and pass booking data
+      navigate('/booking/success', { state: { booking: bookingResp.data } });
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || 'Gagal membuat pesanan. Silakan coba lagi.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const formatDate = (dateString) => {
@@ -104,9 +141,14 @@ const CheckoutPage = () => {
 
           <button 
             onClick={handleConfirm}
-            className="btn-primary w-full !py-4 text-lg"
+            disabled={loading}
+            className="btn-primary w-full !py-4 text-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            KONFIRMASI BOOKING
+            {loading ? (
+              <><Loader2 className="h-5 w-5 animate-spin" /> MEMPROSES...</>
+            ) : (
+              'KONFIRMASI BOOKING'
+            )}
           </button>
         </div>
       </div>

@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// Ini adalah mock/dummy setup karena backend Laravel belum ada
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
   headers: {
@@ -17,14 +16,14 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// Response Interceptor: Handle 401 & Mock Data Sementara
+// Response Interceptor: Handle 401
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Tangani unauthorized
     if (error.response?.status === 401) {
+      console.warn('Unauthorized (401) - Logging out user...');
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      // window.location.href = '/login'; 
     }
     return Promise.reject(error);
   }

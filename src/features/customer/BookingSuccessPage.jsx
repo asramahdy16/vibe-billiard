@@ -1,10 +1,14 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import useBookingStore from '../../store/bookingStore';
 
 const BookingSuccessPage = () => {
-  const { selectedTable, selectedDate, startTime, endTime, selectedPackage, totalPrice, resetBooking } = useBookingStore();
-
+  const location = useLocation();
+  const { resetBooking } = useBookingStore();
+  
+  // Ambil data dari state navigasi if available
+  const bookingData = location.state?.booking;
+  
   useEffect(() => {
     return () => resetBooking();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -46,35 +50,35 @@ const BookingSuccessPage = () => {
           <div className="bg-surface-container-high p-6 space-y-5">
             <div>
               <p className="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Meja</p>
-              <p className="font-bold text-xl text-on-surface">{selectedTable?.name || 'Meja 1'}</p>
+              <p className="font-bold text-xl text-on-surface">{bookingData?.table?.nama_meja || 'Pemesanan'}</p>
             </div>
             
             <div className="flex justify-between">
               <div>
                 <p className="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Tanggal</p>
-                <p className="font-bold text-on-surface">{formatDate(selectedDate)}</p>
+                <p className="font-bold text-on-surface">{formatDate(bookingData?.tanggal)}</p>
               </div>
               <div className="text-right">
                 <p className="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Jam</p>
-                <p className="font-bold text-on-surface">{startTime} - {endTime}</p>
+                <p className="font-bold text-on-surface">{bookingData?.waktu_mulai} - {bookingData?.waktu_selesai}</p>
               </div>
             </div>
 
             <div>
               <p className="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Paket</p>
-              <p className="font-bold text-on-surface">{selectedPackage?.name}</p>
+              <p className="font-bold text-on-surface">{bookingData?.package?.nama_paket || 'Reguler'}</p>
             </div>
 
             {/* Dashed separator */}
             <div className="border-t-2 border-dashed border-outline-variant/20 pt-5">
               <div className="flex justify-between items-center mb-3">
                 <p className="text-on-surface-variant text-sm">Total</p>
-                <p className="font-black text-2xl text-primary">Rp {totalPrice?.toLocaleString('id-ID')}</p>
+                <p className="font-black text-2xl text-primary">Rp {Number(bookingData?.total_harga || 0).toLocaleString('id-ID')}</p>
               </div>
               <div className="flex justify-between items-center">
                 <p className="text-on-surface-variant text-sm">Status</p>
                 <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border border-primary/20">
-                  Pending
+                  {bookingData?.status || 'Pending'}
                 </span>
               </div>
             </div>
@@ -94,7 +98,7 @@ const BookingSuccessPage = () => {
           <Link to="/my-bookings" className="btn-secondary flex-1 text-center">
             Lihat Riwayat
           </Link>
-          <Link to="/" className="btn-primary flex-1 text-center">
+          <Link to="/dashboard" className="btn-primary flex-1 text-center">
             Selesai
           </Link>
         </div>
