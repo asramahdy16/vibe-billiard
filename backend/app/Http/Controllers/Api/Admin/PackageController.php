@@ -22,8 +22,8 @@ class PackageController extends Controller
             'harga_flat' => 'nullable|numeric',
             'durasi_min_jam' => 'required|integer|min:1',
             'hari_berlaku' => 'required|string',
-            'jam_mulai' => 'nullable|date_format:H:i',
-            'jam_selesai' => 'nullable|date_format:H:i',
+            'jam_mulai' => 'nullable|date_format:H:i:s',
+            'jam_selesai' => 'nullable|date_format:H:i:s',
             'is_active' => 'boolean',
         ]);
         

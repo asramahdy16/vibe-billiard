@@ -1,25 +1,90 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import * as packageApi from '../../api/packageApi';
 import toast from 'react-hot-toast';
-import { Pencil, AlertTriangle, Loader2 } from 'lucide-react';
+import { Pencil, AlertTriangle, Loader2, X } from 'lucide-react';
 
 const ManagePackagesPage = () => {
-  const [packages, setPackages] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
+  const [packages, setPackages] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
-    const fetchPackages = async () => {
-      try {
-        const data = await packageApi.adminGetPackages();
-        setPackages(data.data);
-      } catch (error) {
-        toast.error('Gagal mengambil data paket.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingPackage, setEditingPackage] = useState(null);
+  const [formData, setFormData] = useState({
+    nama_paket: '',
+    harga_per_jam: '',
+    harga_flat: '',
+    durasi_min_jam: 1
+  });
+  const [submitting, setSubmitting] = useState(false);
+
+  const fetchPackages = async () => {
+    try {
+      const data = await packageApi.adminGetPackages();
+      setPackages(data.data);
+    } catch (error) {
+      toast.error('Gagal mengambil data paket.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchPackages();
   }, []);
+
+  const openEditModal = (pkg) => {
+    setEditingPackage(pkg);
+    setFormData({
+      nama_paket: pkg.nama_paket,
+      harga_per_jam: pkg.harga_per_jam || '',
+      harga_flat: pkg.harga_flat || '',
+      durasi_min_jam: pkg.durasi_min_jam || 1
+    });
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingPackage(null);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.nama_paket) {
+      toast.error('Nama paket harus diisi');
+      return;
+    }
+
+    const isHemat = editingPackage.harga_flat !== null;
+    if (isHemat && !formData.harga_flat) {
+      toast.error('Harga flat wajib diisi untuk Paket Hemat');
+      return;
+    }
+    if (!isHemat && !formData.harga_per_jam) {
+      toast.error('Harga per jam wajib diisi untuk Paket Reguler');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const payload = {
+        nama_paket: formData.nama_paket,
+        durasi_min_jam: formData.durasi_min_jam,
+        harga_per_jam: formData.harga_per_jam ? Number(formData.harga_per_jam) : null,
+        harga_flat: formData.harga_flat ? Number(formData.harga_flat) : null
+      };
+
+      await packageApi.adminUpdatePackage(editingPackage.id, payload);
+      toast.success('Paket berhasil diupdate');
+      closeModal();
+      fetchPackages();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Gagal mengubah paket');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -30,7 +95,7 @@ const ManagePackagesPage = () => {
   }
 
   return (
-    <div className="p-6 md:p-8">
+    <div className="p-6 md:p-8 relative">
       <div className="mb-8">
         <h1 className="text-4xl font-black tracking-tight text-on-surface mb-1">Manajemen Paket</h1>
         <p className="text-on-surface-variant">Kelola paket harga untuk pelanggan.</p>
@@ -52,7 +117,7 @@ const ManagePackagesPage = () => {
                   : 'bg-gradient-to-r from-primary/20 to-transparent opacity-0 group-hover:opacity-100'}`}>
               </div>
               
-              <div className={`relative rounded-2xl p-8 border overflow-hidden
+              <div className={`relative h-full rounded-2xl p-8 border overflow-hidden
                 ${color === 'tertiary' 
                   ? 'bg-surface-container-highest border-primary/20' 
                   : 'bg-surface-container-high border-outline-variant/10'}`}>
@@ -65,7 +130,10 @@ const ManagePackagesPage = () => {
                 )}
 
                 {/* Edit button */}
-                <button className="absolute top-4 left-4 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container/50 text-on-surface-variant hover:text-primary hover:bg-primary/10 text-xs font-bold transition-all">
+                <button 
+                  onClick={() => openEditModal(pkg)}
+                  className="absolute top-4 left-4 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container/50 text-on-surface-variant z-20 hover:text-primary hover:bg-primary/10 text-xs font-bold transition-all"
+                >
                   <Pencil className="h-3 w-3" /> Edit
                 </button>
 
@@ -109,6 +177,78 @@ const ManagePackagesPage = () => {
           <span className="font-bold text-on-surface">Catatan:</span> Logika Paket Hemat (diskon waktu tertentu) divalidasi langsung oleh sistem backend. Mengubah tipe paket memerlukan penyesuaian di sisi server.
         </p>
       </div>
+
+      {/* Edit Modal */}
+      {isModalOpen && editingPackage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={closeModal}></div>
+          <div className="relative w-full max-w-md card-elevated p-6 animate-in slide-in-from-bottom-8 fade-in-0 duration-300">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-on-surface">Edit Paket</h2>
+              <button onClick={closeModal} className="p-2 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Nama Paket</label>
+                <input 
+                  type="text" 
+                  className="input-field"
+                  value={formData.nama_paket}
+                  onChange={(e) => setFormData({...formData, nama_paket: e.target.value})}
+                  required
+                />
+              </div>
+
+              {editingPackage.harga_flat !== null ? (
+                <div>
+                  <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Harga Flat (Rp)</label>
+                  <input 
+                    type="number" 
+                    className="input-field"
+                    value={formData.harga_flat}
+                    onChange={(e) => setFormData({...formData, harga_flat: e.target.value})}
+                    required
+                  />
+                  <p className="text-xs text-on-surface-variant mt-2">Harga total untuk {formData.durasi_min_jam} jam pertama.</p>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Harga Per Jam (Rp)</label>
+                  <input 
+                    type="number" 
+                    className="input-field"
+                    value={formData.harga_per_jam}
+                    onChange={(e) => setFormData({...formData, harga_per_jam: e.target.value})}
+                    required
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Durasi Minimum (Jam)</label>
+                <input 
+                  type="number" 
+                  min="1"
+                  className="input-field"
+                  value={formData.durasi_min_jam}
+                  onChange={(e) => setFormData({...formData, durasi_min_jam: e.target.value})}
+                  required
+                />
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button type="button" onClick={closeModal} className="btn-secondary flex-1">Batal</button>
+                <button type="submit" disabled={submitting} className="btn-primary flex-1">
+                  {submitting ? 'Menyimpan...' : 'Simpan Perubahan'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

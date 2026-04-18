@@ -44,7 +44,7 @@ const BookingSuccessPage = () => {
           {/* Ticket Header */}
           <div className="bg-gradient-to-r from-primary/20 to-primary-container/10 p-5 border-b border-outline-variant/10 text-center">
             <h2 className="font-black tracking-[0.3em] text-primary text-sm uppercase">Tiket Booking</h2>
-            <p className="text-xs text-on-surface-variant mt-1 font-mono">#BK-20260416-001</p>
+            <p className="text-xs text-on-surface-variant mt-1 font-mono">#BK-{bookingData?.id ? bookingData.id.toString().padStart(6, '0') : '------'}</p>
           </div>
           
           <div className="bg-surface-container-high p-6 space-y-5">

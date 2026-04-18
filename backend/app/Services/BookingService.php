@@ -19,14 +19,10 @@ class BookingService
             ->whereNotIn('status', [BookingStatus::CANCELLED->value])
             ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
             ->where(function ($query) use ($start, $end) {
-                // Konversi string ke format waktu seragam yang bisa diperbandingkan oleh query DB
-                // atau cukup pakai string asalkan formatnya HH:MM:00
-                $query->whereBetween('waktu_mulai', [$start, $end])
-                      ->orWhereBetween('waktu_selesai', [$start, $end])
-                      ->orWhere(function ($q) use ($start, $end) {
-                          $q->where('waktu_mulai', '<=', $start)
-                            ->where('waktu_selesai', '>=', $end);
-                      });
+                // Overlap detection: two intervals overlap when start_a < end_b AND start_b < end_a
+                // Using strict inequality (<) allows consecutive bookings (e.g., 10-12 and 12-14)
+                $query->where('waktu_mulai', '<', $end)
+                      ->where('waktu_selesai', '>', $start);
             })
             ->exists();
     }

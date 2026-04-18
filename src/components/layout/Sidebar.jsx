@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Grid, Package, Banknote, LogOut, ChevronLeft, Menu, Target } from 'lucide-react';
+import { LayoutDashboard, Grid, Package, Banknote, LogOut, ChevronLeft, Menu } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 
 const Sidebar = () => {
   const { pathname } = useLocation();
-  const { clearAuth } = useAuthStore();
+  const { logout } = useAuthStore();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -16,8 +16,8 @@ const Sidebar = () => {
     { name: 'Transaksi', path: '/admin/transactions', icon: <Banknote className="w-5 h-5" /> },
   ];
 
-  const handleLogout = () => {
-    clearAuth();
+  const handleLogout = async () => {
+    await logout();
     navigate('/');
   };
 
@@ -27,7 +27,7 @@ const Sidebar = () => {
       <div className="p-4 flex items-center justify-between h-16 border-b border-outline-variant/10">
         <Link to="/" className="flex items-center gap-2 overflow-hidden">
           <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
-            <Target className="w-4 h-4 text-on-primary-container" />
+            <span className="text-sm font-black text-on-primary-container">VB</span>
           </div>
           {!collapsed && <span className="text-lg font-black tracking-tighter text-on-surface uppercase whitespace-nowrap">Admin</span>}
         </Link>

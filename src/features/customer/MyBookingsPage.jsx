@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import * as bookingApi from '../../api/bookingApi';
 import { CalendarCheck, ArrowRight, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -7,21 +7,34 @@ import toast from 'react-hot-toast';
 const MyBookingsPage = () => {
   const [bookings, setBookings] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const navigate = useNavigate();
+
+  const fetchBookings = async () => {
+    try {
+      const data = await bookingApi.getMyBookings();
+      setBookings(data.data);
+    } catch (error) {
+      toast.error('Gagal mengambil riwayat pemesanan.');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   React.useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const data = await bookingApi.getMyBookings();
-        setBookings(data.data);
-      } catch (error) {
-        toast.error('Gagal mengambil riwayat pemesanan.');
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchBookings();
   }, []);
+
+  const handleCancel = async (id) => {
+    if (!window.confirm('Apakah kamu yakin ingin membatalkan booking ini?')) return;
+    try {
+      await bookingApi.cancelBooking(id);
+      toast.success('Booking berhasil dibatalkan.');
+      fetchBookings();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Gagal membatalkan booking.');
+    }
+  };
 
   const getStatusBadge = (status) => {
     const config = {
@@ -92,8 +105,7 @@ const MyBookingsPage = () => {
 
             {bk.status === 'pending' && (
               <div className="mt-4 pt-4 border-t border-outline-variant/10 flex justify-end gap-3">
-                <button className="btn-secondary !px-4 !py-2 text-xs">Batalkan</button>
-                <button className="btn-primary !px-4 !py-2 text-xs">Bayar Sekarang</button>
+                <button onClick={() => handleCancel(bk.id)} className="btn-secondary !px-4 !py-2 text-xs hover:!bg-error/10 hover:!text-error hover:!border-error/20 transition-colors">Batalkan</button>
               </div>
             )}
           </div>

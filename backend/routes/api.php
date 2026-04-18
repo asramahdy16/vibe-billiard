@@ -28,11 +28,14 @@ Route::get('/packages', [PackageController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'me']);
+    Route::put('/user/profile', [AuthController::class, 'updateProfile']);
+    Route::put('/user/password', [AuthController::class, 'updatePassword']);
 
     // Customer Booking & Payment
     Route::get('/bookings', [BookingController::class, 'index']);
     Route::post('/bookings', [BookingController::class, 'store']);
     Route::get('/bookings/{id}', [BookingController::class, 'show']);
+    Route::patch('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
     
     Route::post('/bookings/{id}/payment', [PaymentController::class, 'store']);
 

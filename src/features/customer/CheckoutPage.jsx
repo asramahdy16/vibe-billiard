@@ -34,11 +34,11 @@ const CheckoutPage = () => {
     setLoading(true);
     try {
       // 1. Create Booking
-      const isoDate = new Date(selectedDate).toISOString().split('T')[0];
+      // selectedDate is already in local YYYY-MM-DD format
       const bookingResp = await bookingApi.createBooking({
         table_id: selectedTable.id,
         package_id: selectedPackage.id,
-        tanggal: isoDate,
+        tanggal: selectedDate,
         waktu_mulai: startTime,
         waktu_selesai: endTime,
         catatan: `Metode pembayaran: ${paymentMethod}`
@@ -95,7 +95,7 @@ const CheckoutPage = () => {
           
           <div className="space-y-5 text-on-surface-variant">
             {[
-              { label: 'Meja', value: selectedTable.name },
+              { label: 'Meja', value: selectedTable.nama_meja || selectedTable.name },
               { label: 'Tanggal', value: formatDate(selectedDate) },
               { label: 'Waktu', value: `${startTime} - ${endTime}` },
               { label: 'Paket', value: selectedPackage.name },

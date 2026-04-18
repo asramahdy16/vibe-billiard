@@ -24,3 +24,8 @@ export const adminUpdateBookingStatus = async (id, status) => {
   const response = await API.patch(`/admin/bookings/${id}/status`, { status });
   return response.data;
 };
+
+export const cancelBooking = async (id) => {
+  const response = await API.patch(`/bookings/${id}/cancel`);
+  return response.data;
+};

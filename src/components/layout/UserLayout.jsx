@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
-import { LayoutDashboard, CalendarCheck, Clock, User, LogOut, ChevronLeft, Menu, Target, Home } from 'lucide-react';
+import { LayoutDashboard, CalendarCheck, Clock, User, LogOut, ChevronLeft, Menu, Home } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 
 const UserLayout = ({ children }) => {
   const { pathname } = useLocation();
-  const { user, clearAuth } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -17,8 +17,8 @@ const UserLayout = ({ children }) => {
     { name: 'Profil', path: '/profile', icon: <User className="w-5 h-5" /> },
   ];
 
-  const handleLogout = () => {
-    clearAuth();
+  const handleLogout = async () => {
+    await logout();
     navigate('/');
   };
 
@@ -30,7 +30,7 @@ const UserLayout = ({ children }) => {
         <div className="px-4 flex items-center justify-between h-16 border-b border-outline-variant/10">
           <Link to="/dashboard" className="flex items-center gap-2 overflow-hidden">
             <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
-              <Target className="w-4 h-4 text-on-primary-container" />
+              <span className="text-xs font-black text-on-primary-container">VB</span>
             </div>
             {!collapsed && <span className="text-lg font-black tracking-tighter text-on-surface uppercase whitespace-nowrap">Vibe</span>}
           </Link>
@@ -89,7 +89,7 @@ const UserLayout = ({ children }) => {
       <div className="md:hidden fixed top-0 w-full z-50 glass-nav shadow-[0_20px_40px_-10px_rgba(0,40,93,0.4)] h-14 flex items-center justify-between px-4">
         <Link to="/dashboard" className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg gradient-primary flex items-center justify-center">
-            <Target className="w-3.5 h-3.5 text-on-primary-container" />
+            <span className="text-[10px] font-black text-on-primary-container">VB</span>
           </div>
           <span className="text-base font-black tracking-tighter text-on-surface uppercase">Vibe</span>
         </Link>

@@ -9,7 +9,8 @@ function App() {
 
   React.useEffect(() => {
     checkAuth();
-  }, [checkAuth]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <BrowserRouter>

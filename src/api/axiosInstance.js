@@ -21,9 +21,12 @@ API.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      console.warn('Unauthorized (401) - Logging out user...');
+      console.warn('Unauthorized (401) - Clearing auth state...');
       localStorage.removeItem('token');
-      // window.location.href = '/login'; 
+      // Dynamically import store to avoid circular dependency
+      import('../store/authStore').then(({ default: useAuthStore }) => {
+        useAuthStore.getState().clearAuth();
+      });
     }
     return Promise.reject(error);
   }

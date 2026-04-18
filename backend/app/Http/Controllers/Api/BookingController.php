@@ -102,4 +102,26 @@ class BookingController extends Controller
         
         return new BookingResource($booking);
     }
+
+    public function cancel(Request $request, $id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        if ($booking->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        if ($booking->status !== BookingStatus::PENDING) {
+            return response()->json([
+                'message' => 'Hanya booking dengan status pending yang dapat dibatalkan.'
+            ], 400);
+        }
+
+        $booking->update(['status' => BookingStatus::CANCELLED]);
+
+        return response()->json([
+            'message' => 'Booking berhasil dibatalkan.',
+            'data' => new BookingResource($booking->load(['table', 'package']))
+        ]);
+    }
 }

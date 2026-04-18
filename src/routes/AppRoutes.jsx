@@ -43,13 +43,23 @@ const AdminLayout = ({ children }) => (
 
 // === Route Guards ===
 const PrivateRoute = ({ children }) => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, isLoading } = useAuthStore();
+  if (isLoading) return null; // Prevent redirect flash during auth check
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   return children;
 };
 
+const AdminRoute = ({ children }) => {
+  const { isAuthenticated, isLoading, user } = useAuthStore();
+  if (isLoading) return null;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (user?.role !== 'admin') return <Navigate to="/dashboard" replace />;
+  return children;
+};
+
 const GuestRoute = ({ children }) => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, isLoading } = useAuthStore();
+  if (isLoading) return null;
   if (isAuthenticated) return <Navigate to="/dashboard" replace />;
   return children;
 };
@@ -71,10 +81,10 @@ const AppRoutes = () => {
       <Route path="/profile" element={<PrivateRoute><UserLayout><ProfilePage /></UserLayout></PrivateRoute>} />
 
       {/* ===== ADMIN ROUTES ===== */}
-      <Route path="/admin" element={<PrivateRoute><AdminLayout><DashboardPage /></AdminLayout></PrivateRoute>} />
-      <Route path="/admin/tables" element={<PrivateRoute><AdminLayout><ManageTablesPage /></AdminLayout></PrivateRoute>} />
-      <Route path="/admin/packages" element={<PrivateRoute><AdminLayout><ManagePackagesPage /></AdminLayout></PrivateRoute>} />
-      <Route path="/admin/transactions" element={<PrivateRoute><AdminLayout><TransactionsPage /></AdminLayout></PrivateRoute>} />
+      <Route path="/admin" element={<AdminRoute><AdminLayout><DashboardPage /></AdminLayout></AdminRoute>} />
+      <Route path="/admin/tables" element={<AdminRoute><AdminLayout><ManageTablesPage /></AdminLayout></AdminRoute>} />
+      <Route path="/admin/packages" element={<AdminRoute><AdminLayout><ManagePackagesPage /></AdminLayout></AdminRoute>} />
+      <Route path="/admin/transactions" element={<AdminRoute><AdminLayout><TransactionsPage /></AdminLayout></AdminRoute>} />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />

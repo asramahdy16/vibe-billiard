@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, MessageCircle, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 import toast from 'react-hot-toast';
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = React.useState(false);
-  const [email, setEmail] = React.useState('user@contoh.com');
-  const [password, setPassword] = React.useState('password123');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
   const { login, isLoading } = useAuthStore();
   const navigate = useNavigate();
 
@@ -80,13 +80,6 @@ const LoginPage = () => {
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
-              <div className="flex justify-between items-center mt-3">
-                <label className="flex items-center space-x-2 text-sm text-on-surface-variant cursor-pointer">
-                  <input type="checkbox" className="rounded border-outline-variant bg-surface-container accent-primary" />
-                  <span>Ingat saya</span>
-                </label>
-                <a href="#" className="text-sm text-primary hover:underline">Lupa password?</a>
-              </div>
             </div>
 
             <button 
@@ -97,19 +90,6 @@ const LoginPage = () => {
               {isLoading ? 'MEMPROSES...' : 'MASUK'}
             </button>
           </form>
-
-          <div className="my-6 relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-outline-variant/20"></div>
-            </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="px-3 bg-surface-variant text-on-surface-variant font-medium rounded-full">atau</span>
-            </div>
-          </div>
-
-          <button className="w-full py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1DA851] text-white hover:scale-[1.02] active:scale-95">
-            <MessageCircle className="h-5 w-5" /> Login via WhatsApp
-          </button>
 
           <p className="text-center mt-8 text-sm text-on-surface-variant">
             Belum punya akun? <Link to="/register" className="text-primary font-bold hover:underline">Daftar sekarang</Link>

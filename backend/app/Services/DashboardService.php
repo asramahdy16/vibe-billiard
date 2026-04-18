@@ -14,7 +14,7 @@ class DashboardService
         $today = Carbon::today()->format('Y-m-d');
         
         $totalBookingsToday = Booking::where('tanggal', $today)
-            ->whereNotIn('status', [BookingStatus::CANCELLED])
+            ->whereNotIn('status', [BookingStatus::CANCELLED->value])
             ->count();
             
         $todayRevenue = Booking::where('tanggal', $today)

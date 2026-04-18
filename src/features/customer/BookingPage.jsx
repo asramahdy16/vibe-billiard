@@ -55,7 +55,13 @@ const BookingPage = () => {
         endTimeStr = '23:59';
       }
       
-      setDateTime(date.toISOString(), time, endTimeStr);
+      // Format date as local YYYY-MM-DD to avoid UTC timezone shift
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const localDateStr = `${year}-${month}-${day}`;
+      
+      setDateTime(localDateStr, time, endTimeStr);
       setStep(3);
     }
     else if (step === 3 && selectedPackage) navigate('/booking/checkout');
