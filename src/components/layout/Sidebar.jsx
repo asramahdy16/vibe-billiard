@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Grid, Package, Banknote, LogOut, ChevronLeft, Menu } from 'lucide-react';
+import { LayoutDashboard, Grid, Package, CalendarCheck, Banknote, LogOut, ChevronLeft, Menu } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 
 const Sidebar = () => {
@@ -13,6 +13,7 @@ const Sidebar = () => {
     { name: 'Dashboard', path: '/admin', icon: <LayoutDashboard className="w-5 h-5" /> },
     { name: 'Meja', path: '/admin/tables', icon: <Grid className="w-5 h-5" /> },
     { name: 'Paket', path: '/admin/packages', icon: <Package className="w-5 h-5" /> },
+    { name: 'Booking', path: '/admin/bookings', icon: <CalendarCheck className="w-5 h-5" /> },
     { name: 'Transaksi', path: '/admin/transactions', icon: <Banknote className="w-5 h-5" /> },
   ];
 

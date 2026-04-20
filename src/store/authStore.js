@@ -5,7 +5,7 @@ const useAuthStore = create((set) => ({
   user: null, 
   token: localStorage.getItem('token') || null,
   isAuthenticated: !!localStorage.getItem('token'),
-  isLoading: false,
+  isLoading: !!localStorage.getItem('token'), // true if token exists, so route guards wait for checkAuth
 
   setAuth: (user, token) => {
     localStorage.setItem('token', token);

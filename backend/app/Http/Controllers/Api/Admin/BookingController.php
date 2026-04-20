@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Booking;
+use App\Enums\BookingStatus;
 use App\Http\Requests\Booking\UpdateBookingStatusRequest;
 use App\Http\Resources\BookingResource;
 
@@ -19,14 +20,19 @@ class BookingController extends Controller
     public function updateStatus(UpdateBookingStatusRequest $request, $id)
     {
         $booking = Booking::findOrFail($id);
-        $booking->update(['status' => $request->status]);
+        $newStatus = $request->status;
+        
+        $booking->update(['status' => $newStatus]);
         
         // kalau in_progress, update status meja jg
-        if ($request->status === 'in_progress') {
+        if ($newStatus === 'in_progress') {
             $booking->table->update(['status' => 'in_use']);
-        } elseif (in_array($request->status, ['completed', 'cancelled'])) {
+        } elseif (in_array($newStatus, ['completed', 'cancelled'])) {
             $booking->table->update(['status' => 'available']);
         }
+        
+        // Reload with relationships for fresh response
+        $booking->load(['user', 'table', 'package', 'payment']);
         
         return response()->json([
             'message' => 'Status booking berhasil diupdate',
@@ -34,3 +40,4 @@ class BookingController extends Controller
         ], 200);
     }
 }
+

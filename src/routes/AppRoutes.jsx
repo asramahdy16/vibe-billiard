@@ -25,6 +25,7 @@ import DashboardPage from '../features/admin/DashboardPage';
 import ManageTablesPage from '../features/admin/ManageTablesPage';
 import ManagePackagesPage from '../features/admin/ManagePackagesPage';
 import TransactionsPage from '../features/admin/TransactionsPage';
+import ManageBookingsPage from '../features/admin/ManageBookingsPage';
 
 // === Layouts ===
 const PublicLayout = ({ children }) => (
@@ -84,6 +85,7 @@ const AppRoutes = () => {
       <Route path="/admin" element={<AdminRoute><AdminLayout><DashboardPage /></AdminLayout></AdminRoute>} />
       <Route path="/admin/tables" element={<AdminRoute><AdminLayout><ManageTablesPage /></AdminLayout></AdminRoute>} />
       <Route path="/admin/packages" element={<AdminRoute><AdminLayout><ManagePackagesPage /></AdminLayout></AdminRoute>} />
+      <Route path="/admin/bookings" element={<AdminRoute><AdminLayout><ManageBookingsPage /></AdminLayout></AdminRoute>} />
       <Route path="/admin/transactions" element={<AdminRoute><AdminLayout><TransactionsPage /></AdminLayout></AdminRoute>} />
 
       {/* Catch-all */}
