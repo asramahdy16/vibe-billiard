@@ -27,6 +27,9 @@ import ManagePackagesPage from '../features/admin/ManagePackagesPage';
 import TransactionsPage from '../features/admin/TransactionsPage';
 import ManageBookingsPage from '../features/admin/ManageBookingsPage';
 
+// Error Pages
+import NotFoundPage from '../features/error/NotFoundPage';
+
 // === Layouts ===
 const PublicLayout = ({ children }) => (
   <div className="flex flex-col min-h-screen">
@@ -89,7 +92,7 @@ const AppRoutes = () => {
       <Route path="/admin/transactions" element={<AdminRoute><AdminLayout><TransactionsPage /></AdminLayout></AdminRoute>} />
 
       {/* Catch-all */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<PublicLayout><NotFoundPage /></PublicLayout>} />
     </Routes>
   );
 };

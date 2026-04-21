@@ -2,6 +2,8 @@ import React from 'react';
 import * as bookingApi from '../../api/bookingApi';
 import toast from 'react-hot-toast';
 import { Search, Loader2, ChevronDown, CalendarCheck, Clock, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import ScrollReveal from '../../components/ui/ScrollReveal';
+import AnimatedCounter from '../../components/ui/AnimatedCounter';
 
 const STATUS_CONFIG = {
   pending: { label: 'Pending', color: 'bg-primary/10 text-primary border-primary/20', icon: <AlertCircle className="w-3 h-3" /> },
@@ -129,17 +131,17 @@ const ManageBookingsPage = () => {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-8">
+      <ScrollReveal className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-8">
         {statsSummary.map((s, i) => (
           <div key={i} className="card-elevated p-4 text-center">
             <p className="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1">{s.label}</p>
-            <p className={`text-3xl font-black ${s.color}`}>{s.value}</p>
+            <AnimatedCounter value={s.value} className={`text-3xl font-black ${s.color}`} />
           </div>
         ))}
-      </div>
+      </ScrollReveal>
 
       {/* Table */}
-      <div className="card-elevated overflow-hidden">
+      <ScrollReveal delay={0.2} direction="up" className="card-elevated overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-surface-container text-on-surface-variant border-b border-outline-variant/10">
@@ -207,7 +209,7 @@ const ManageBookingsPage = () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </ScrollReveal>
     </div>
   );
 };

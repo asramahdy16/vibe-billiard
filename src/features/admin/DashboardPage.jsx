@@ -4,6 +4,8 @@ import * as dashboardApi from '../../api/dashboardApi';
 import * as bookingApi from '../../api/bookingApi';
 import toast from 'react-hot-toast';
 import { Loader2, Banknote, CalendarCheck, Clock, Users, TrendingUp, ArrowUpRight } from 'lucide-react';
+import ScrollReveal from '../../components/ui/ScrollReveal';
+import AnimatedCounter from '../../components/ui/AnimatedCounter';
 
 const DashboardPage = () => {
   const [stats, setStats] = React.useState({
@@ -34,10 +36,10 @@ const DashboardPage = () => {
   }, []);
 
   const statsItems = [
-    { icon: <Banknote className="w-7 h-7" />, iconBg: 'bg-primary/10 text-primary', label: 'Pendapatan Hari Ini', value: `Rp ${Number(stats.today_revenue).toLocaleString('id-ID')}` },
-    { icon: <CalendarCheck className="w-7 h-7" />, iconBg: 'bg-tertiary/10 text-tertiary', label: 'Booking Hari Ini', value: `${stats.total_bookings_today} Pesanan` },
-    { icon: <Clock className="w-7 h-7" />, iconBg: 'bg-primary-container/10 text-primary-container', label: 'Meja Terpakai', value: `${stats.tables_in_use} Meja` },
-    { icon: <Users className="w-7 h-7" />, iconBg: 'bg-secondary/10 text-secondary', label: 'Pembayaran Tertunda', value: stats.pending_payments.toString() },
+    { icon: <Banknote className="w-7 h-7" />, iconBg: 'bg-primary/10 text-primary', label: 'Pendapatan', value: stats.today_revenue, prefix: 'Rp ', suffix: '' },
+    { icon: <CalendarCheck className="w-7 h-7" />, iconBg: 'bg-tertiary/10 text-tertiary', label: 'Booking Harian', value: stats.total_bookings_today, prefix: '', suffix: ' Psn' },
+    { icon: <Clock className="w-7 h-7" />, iconBg: 'bg-primary-container/10 text-primary-container', label: 'Meja Terpakai', value: stats.tables_in_use, prefix: '', suffix: ' / 12' },
+    { icon: <Users className="w-7 h-7" />, iconBg: 'bg-secondary/10 text-secondary', label: 'Tunggu Bayar', value: stats.pending_payments, prefix: '', suffix: ' Antrian' },
   ];
 
   if (loading) {
@@ -56,25 +58,30 @@ const DashboardPage = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      <ScrollReveal className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         {statsItems.map((stat, i) => (
           <div key={i} className="card-elevated p-5 group hover:shadow-[0_10px_30px_-10px_rgba(0,40,93,0.3)] transition-all duration-500 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-primary/3 rounded-full blur-2xl -z-0 group-hover:bg-primary/5 transition-all"></div>
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 rounded-xl ${stat.iconBg} flex items-center justify-center`}>
+                 <div className={`w-12 h-12 rounded-xl ${stat.iconBg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
                   {stat.icon}
                 </div>
               </div>
               <p className="text-xs text-on-surface-variant uppercase tracking-widest font-bold mb-1">{stat.label}</p>
-              <p className="text-2xl font-black text-on-surface">{stat.value}</p>
+              <AnimatedCounter 
+                value={stat.value} 
+                prefix={stat.prefix} 
+                suffix={stat.suffix}
+                className="text-2xl font-black text-on-surface block truncate" 
+              />
             </div>
           </div>
         ))}
-      </div>
+      </ScrollReveal>
 
       {/* Recent Bookings Table */}
-      <div className="card-elevated overflow-hidden">
+      <ScrollReveal delay={0.2} direction="up" className="card-elevated overflow-hidden">
         <div className="p-6 border-b border-outline-variant/10 flex items-center justify-between">
           <h2 className="text-xl font-bold text-on-surface">Booking Terbaru</h2>
           <Link to="/admin/transactions" className="text-primary text-sm font-bold hover:underline flex items-center gap-1">
@@ -117,7 +124,7 @@ const DashboardPage = () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </ScrollReveal>
     </div>
   );
 };

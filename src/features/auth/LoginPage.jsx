@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import useAuthStore from '../../store/authStore';
 import toast from 'react-hot-toast';
 
@@ -32,20 +33,34 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4 pb-24 md:pb-4 relative">
-      {/* Background glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl"></div>
+    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4 pb-24 md:pb-4 relative overflow-hidden">
+      {/* Animated Background Orbs */}
+      <motion.div 
+        animate={{ x: [0, 50, -30, 0], y: [0, -30, 50, 0] }}
+        transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+        className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px]" 
+      />
       
       <div className="relative w-full max-w-md">
         {/* Glass card */}
-        <div className="glass-panel rounded-2xl border border-outline-variant/10 p-8 relative overflow-hidden">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="glass-panel rounded-2xl border border-outline-variant/10 p-8 relative overflow-hidden"
+        >
           {/* Top accent */}
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary-container"></div>
 
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, type: "spring" }}
+              className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4"
+            >
               <span className="text-3xl">🔐</span>
-            </div>
+            </motion.div>
             <h1 className="text-3xl font-black tracking-tight text-on-surface mb-2">Masuk</h1>
             <p className="text-on-surface-variant text-sm">Selamat datang kembali di Vibe Billiard</p>
           </div>
@@ -84,17 +99,19 @@ const LoginPage = () => {
 
             <button 
               type="submit" 
-              className="btn-primary w-full !py-3.5 text-base disabled:opacity-70 disabled:cursor-not-allowed"
+              className="btn-primary w-full !py-3.5 text-base flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               disabled={isLoading}
             >
-              {isLoading ? 'MEMPROSES...' : 'MASUK'}
+              {isLoading ? (
+                <><Loader2 className="w-5 h-5 animate-spin" /> MEMPROSES...</>
+              ) : 'MASUK'}
             </button>
           </form>
 
           <p className="text-center mt-8 text-sm text-on-surface-variant">
             Belum punya akun? <Link to="/register" className="text-primary font-bold hover:underline">Daftar sekarang</Link>
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

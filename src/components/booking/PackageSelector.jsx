@@ -3,6 +3,7 @@ import { getDay } from 'date-fns';
 import * as packageApi from '../../api/packageApi';
 import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 
 const PackageSelector = ({ date, startTime, duration, selectedPackage, onSelectPackage }) => {
   const [packages, setPackages] = useState([]);
@@ -72,7 +73,7 @@ const PackageSelector = ({ date, startTime, duration, selectedPackage, onSelectP
       <h3 className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-4">Pilih Paket</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        {eligiblePackages.map((pkg) => {
+        {eligiblePackages.map((pkg, idx) => {
           const isHemat = pkg.harga_flat !== null;
           const price = calculatePrice(pkg);
           const isSelected = selectedPackage?.id === pkg.id;
@@ -81,55 +82,66 @@ const PackageSelector = ({ date, startTime, duration, selectedPackage, onSelectP
           const unitLabel = isHemat ? `/${pkg.durasi_min_jam} jam` : '/jam';
 
           return (
-            <div key={pkg.id} className="relative group" onClick={() => handleSelect(pkg)}>
+            <motion.div 
+              key={pkg.id} 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1, duration: 0.4 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="relative group w-full" 
+              onClick={() => handleSelect(pkg)}
+            >
               <div className={`absolute -inset-1 bg-gradient-to-r ${isHemat ? 'from-tertiary/30 to-primary/30' : 'from-primary/20 to-transparent'} rounded-2xl blur transition duration-500 ${isSelected ? 'opacity-100' : isHemat ? 'opacity-70' : 'opacity-0 group-hover:opacity-50'}`}></div>
-              <div className={`relative rounded-2xl p-6 cursor-pointer transition-all duration-300 border overflow-hidden
+              <div className={`relative rounded-2xl p-6 cursor-pointer transition-colors duration-300 border overflow-hidden h-full flex flex-col justify-between
                 ${isSelected 
-                  ? `bg-${color}/10 border-${color} ring-2 ring-${color} ${isHemat ? '' : 'shadow-[0_0_25px_rgba(173,198,255,0.2)]'}` 
-                  : `${isHemat ? 'bg-surface-container-highest border-primary/20' : 'bg-surface-container-high border-outline-variant/10'} hover:bg-surface-container-highest`}
+                  ? `bg-${color}/10 border-${color} ring-2 ring-${color} ${isHemat ? 'shadow-[0_0_20px_rgba(74,225,118,0.2)]' : 'shadow-[0_0_25px_rgba(173,198,255,0.2)]'}` 
+                  : `${isHemat ? 'bg-surface-container-highest border-tertiary/20' : 'bg-surface-container-high border-outline-variant/10'} hover:bg-surface-container-highest`}
               `}>
                 {isHemat && (
-                  <div className="absolute top-0 right-0 bg-tertiary text-on-tertiary text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-bl-xl">
+                  <div className="absolute top-0 right-0 bg-tertiary text-on-tertiary text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-bl-xl shadow-lg">
                     HEMAT
                   </div>
                 )}
 
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <h4 className="text-2xl font-bold text-on-surface">{pkg.nama_paket.replace('Paket ', '')}</h4>
-                    <p className={`${isHemat ? 'text-tertiary' : 'text-on-surface-variant'} uppercase text-[10px] tracking-widest font-bold mt-1`}>
-                      {isHemat ? 'Pilihan Pro' : 'Standar Terbaik'}
-                    </p>
+                <div>
+                  <div className="flex justify-between items-start mb-6">
+                    <div>
+                      <h4 className="text-2xl font-bold text-on-surface">{pkg.nama_paket.replace('Paket ', '')}</h4>
+                      <p className={`${isHemat ? 'text-tertiary' : 'text-on-surface-variant'} uppercase text-[10px] tracking-widest font-bold mt-1`}>
+                        {isHemat ? 'Pilihan Pro' : 'Standar Terbaik'}
+                      </p>
+                    </div>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors
+                      ${isSelected ? `border-${color} bg-${color}` : 'border-outline'}`}>
+                      {isSelected && <motion.div initial={{scale:0}} animate={{scale:1}} className={`w-2 h-2 ${isHemat ? 'bg-on-tertiary' : 'bg-on-primary-container'} rounded-full`} />}
+                    </div>
                   </div>
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all
-                    ${isSelected ? `border-${color} bg-${color}` : 'border-outline'}`}>
-                    {isSelected && <div className={`w-2 h-2 ${isHemat ? 'bg-on-tertiary' : 'bg-on-primary-container'} rounded-full`} />}
-                  </div>
+
+                  <p className="text-on-surface-variant text-sm mb-1">
+                    Rp {Number(pricePerUnit).toLocaleString('id-ID')} <span className="text-xs">{unitLabel}</span>
+                  </p>
+                  <p className="text-on-surface mb-4">
+                    Total: <span className={`font-black text-3xl text-${color}`}>Rp {price.toLocaleString('id-ID')}</span>
+                  </p>
+
+                  <ul className={`text-sm space-y-3 ${isHemat ? '' : 'text-on-surface-variant'}`}>
+                    {isHemat ? (
+                      <>
+                        <li className="flex items-start gap-2 text-tertiary"><span className="shrink-0 pt-0.5">✓</span> <span>Senin - Jumat, 08:00 - 17:00</span></li>
+                        <li className="flex items-start gap-2 text-on-surface-variant"><span className="text-tertiary shrink-0 pt-0.5">✓</span> <span>{duration > pkg.durasi_min_jam ? `+ ${duration - pkg.durasi_min_jam} jam reguler` : `Pas ${pkg.durasi_min_jam} Jam`}</span></li>
+                        <li className="flex items-start gap-2 text-on-surface-variant"><span className="text-tertiary shrink-0 pt-0.5">✓</span> <span>Hemat hingga 30%!</span></li>
+                      </>
+                    ) : (
+                      <>
+                        <li className="flex items-start gap-2"><span className="text-tertiary shrink-0 pt-0.5">✓</span> <span>Berlaku setiap saat</span></li>
+                        <li className="flex items-start gap-2"><span className="text-tertiary shrink-0 pt-0.5">✓</span> <span>Durasi fleksibel</span></li>
+                      </>
+                    )}
+                  </ul>
                 </div>
-
-                <p className="text-on-surface-variant text-sm mb-1">
-                  Rp {Number(pricePerUnit).toLocaleString('id-ID')} <span className="text-xs">{unitLabel}</span>
-                </p>
-                <p className="text-on-surface mb-4">
-                  Total: <span className={`font-black text-2xl text-${color}`}>Rp {price.toLocaleString('id-ID')}</span>
-                </p>
-
-                <ul className={`text-sm space-y-2 ${isHemat ? '' : 'text-on-surface-variant'}`}>
-                  {isHemat ? (
-                    <>
-                      <li className="flex items-center gap-2 text-tertiary font-medium"><span>✓</span> Senin - Jumat, 08:00 - 17:00</li>
-                      <li className="flex items-center gap-2 text-on-surface-variant"><span className="text-tertiary">✓</span> {duration > pkg.durasi_min_jam ? `+ ${duration - pkg.durasi_min_jam} jam reguler` : `Pas ${pkg.durasi_min_jam} Jam`}</li>
-                      <li className="flex items-center gap-2 text-on-surface-variant"><span className="text-tertiary">✓</span> Hemat hingga 30%!</li>
-                    </>
-                  ) : (
-                    <>
-                      <li className="flex items-center gap-2"><span className="text-tertiary">✓</span> Berlaku setiap saat</li>
-                      <li className="flex items-center gap-2"><span className="text-tertiary">✓</span> Durasi fleksibel</li>
-                    </>
-                  )}
-                </ul>
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>

@@ -110,10 +110,48 @@
   50% { opacity: 0.6; }
 }
 
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
 
 .animate-glow-pulse {
   animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* DatePicker Dark Theme Override */
+.react-datepicker-wrapper, .react-datepicker__input-container {
+  display: block;
+}
+.react-datepicker {
+  background-color: #171f33 !important;
+  border: 1px solid rgba(66, 71, 84, 0.3) !important;
+  font-family: inherit !important;
+}
+.react-datepicker__header {
+  background-color: #222a3d !important;
+  border-bottom: 1px solid rgba(66, 71, 84, 0.3) !important;
+}
+.react-datepicker__current-month, .react-datepicker-time__header, .react-datepicker-year-header {
+  color: #dae2fd !important;
+}
+.react-datepicker__day-name, .react-datepicker__day, .react-datepicker__time-name {
+  color: #c2c6d6 !important;
+}
+.react-datepicker__day:hover, .react-datepicker__month-text:hover, .react-datepicker__quarter-text:hover, .react-datepicker__year-text:hover {
+  background-color: #2d3449 !important;
+}
+.react-datepicker__day--selected, .react-datepicker__day--in-selecting-range, .react-datepicker__day--in-range, .react-datepicker__month-text--selected, .react-datepicker__month-text--in-selecting-range, .react-datepicker__month-text--in-range, .react-datepicker__quarter-text--selected, .react-datepicker__quarter-text--in-selecting-range, .react-datepicker__quarter-text--in-range, .react-datepicker__year-text--selected, .react-datepicker__year-text--in-selecting-range, .react-datepicker__year-text--in-range {
+  background-color: #4d8eff !important;
+  color: #0b1326 !important;
+}
+.react-datepicker__day--keyboard-selected, .react-datepicker__month-text--keyboard-selected, .react-datepicker__quarter-text--keyboard-selected, .react-datepicker__year-text--keyboard-selected {
+  background-color: #31394d !important;
+}
+.react-datepicker__day--disabled, .react-datepicker__month-text--disabled, .react-datepicker__quarter-text--disabled, .react-datepicker__year-text--disabled {
+  color: #424754 !important;
 }

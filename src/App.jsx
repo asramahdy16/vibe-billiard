@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import AppRoutes from './routes/AppRoutes';
 import useAuthStore from './store/authStore';
+import ScrollToTop from './components/layout/ScrollToTop';
 
 function App() {
   const { checkAuth } = useAuthStore();
@@ -14,6 +15,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AppRoutes />
       <Toaster 
         position="top-right"

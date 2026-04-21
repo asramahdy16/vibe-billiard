@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import useBookingStore from '../../store/bookingStore';
+import { motion } from 'framer-motion';
 
 const BookingSuccessPage = () => {
   const location = useLocation();
@@ -22,9 +23,18 @@ const BookingSuccessPage = () => {
   return (
     <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4 pb-24 md:pb-4 relative">
       {/* Background celebration glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-tertiary/5 rounded-full blur-3xl animate-glow-pulse"></div>
+      <motion.div 
+        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }} 
+        transition={{ duration: 4, repeat: Infinity }} 
+        className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-tertiary/10 rounded-full blur-[100px]"
+      />
       
-      <div className="max-w-md w-full flex flex-col items-center relative z-10">
+      <motion.div 
+        initial={{ scale: 0.9, opacity: 0, y: 30 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        transition={{ type: 'spring', bounce: 0.4, duration: 0.8 }}
+        className="max-w-md w-full flex flex-col items-center relative z-10"
+      >
         
         {/* Success Icon */}
         <div className="relative mb-6">
@@ -102,7 +112,7 @@ const BookingSuccessPage = () => {
             Selesai
           </Link>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

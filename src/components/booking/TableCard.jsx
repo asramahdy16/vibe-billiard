@@ -1,6 +1,7 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
-const TableCard = ({ table, selected, onSelect }) => {
+const TableCard = ({ table, selected, onSelect, delay = 0 }) => {
   const isAvailable = table.status === 'available';
 
   const statusConfig = {
@@ -13,13 +14,18 @@ const TableCard = ({ table, selected, onSelect }) => {
   const sc = statusConfig[table.status];
 
   return (
-    <div 
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay }}
+      whileHover={{ scale: isAvailable ? 1.02 : 1 }}
+      whileTap={{ scale: isAvailable ? 0.98 : 1 }}
       onClick={() => isAvailable && onSelect(table)}
-      className={`relative rounded-2xl p-5 cursor-pointer transition-all duration-300 border overflow-hidden group
+      className={`relative rounded-2xl p-5 cursor-pointer transition-colors duration-300 border overflow-hidden group
         ${selected 
           ? 'border-primary bg-primary/10 ring-2 ring-primary shadow-[0_0_25px_rgba(173,198,255,0.2)]' 
           : 'border-outline-variant/10 bg-surface-container-low hover:bg-surface-container-high'}
-        ${!isAvailable && 'opacity-40 cursor-not-allowed'}
+        ${!isAvailable && 'opacity-40 cursor-not-allowed grayscale'}
       `}
     >
       {/* Background number decoration */}
@@ -40,7 +46,7 @@ const TableCard = ({ table, selected, onSelect }) => {
         </div>
         <h3 className="font-bold text-lg text-on-surface">{table.name}</h3>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

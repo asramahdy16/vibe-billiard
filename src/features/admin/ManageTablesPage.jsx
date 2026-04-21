@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import * as tableApi from '../../api/tableApi';
 import toast from 'react-hot-toast';
 import { Loader2, Plus, Pencil, Trash2, X } from 'lucide-react';
+import ScrollReveal from '../../components/ui/ScrollReveal';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const ManageTablesPage = () => {
   const [tables, setTables] = useState([]);
@@ -112,42 +114,45 @@ const ManageTablesPage = () => {
       </div>
 
       {/* Cards Grid View */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {tables.map(t => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
+        {tables.map((t, idx) => {
           const sc = statusConfig[t.status] || statusConfig.available;
           return (
-            <div key={t.id} className="card-elevated p-5 group hover:shadow-[0_10px_30px_-10px_rgba(0,40,93,0.3)] transition-all duration-500 relative overflow-hidden">
+            <ScrollReveal delay={idx * 0.05} key={t.id} className="card-elevated p-5 group hover:shadow-[0_10px_30px_-10px_rgba(0,40,93,0.3)] transition-all duration-500 relative overflow-hidden flex flex-col h-full">
               {/* Background decoration */}
               <div className="absolute -bottom-4 -right-4 text-8xl font-black text-on-surface/3 group-hover:text-on-surface/5 transition-opacity pointer-events-none">
                 {t.nama_meja.replace('Meja ', '').replace('VIP ', 'V')}
               </div>
               
-              <div className="relative z-10">
+              <div className="relative z-10 flex flex-col flex-1">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                  <div className="w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-sm">
                     🎱
                   </div>
-                  <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider border ${sc.bg} ${sc.text} ${sc.border}`}>
+                  <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider border shadow-sm ${sc.bg} ${sc.text} ${sc.border}`}>
                     {sc.label}
                   </span>
                 </div>
 
-                <h3 className="text-xl font-bold text-on-surface mb-1">{t.nama_meja}</h3>
-                <p className="text-sm text-on-surface-variant mb-4">ID: #{t.id}</p>
+                <div className="mb-4">
+                  <h3 className="text-xl font-bold text-on-surface mb-1">{t.nama_meja}</h3>
+                  <p className="text-sm text-on-surface-variant font-mono">ID: #{t.id.toString().padStart(3, '0')}</p>
+                </div>
 
-                <div className="flex gap-2">
-                  <button onClick={() => openEditModal(t)} className="flex items-center gap-1 px-3 py-2 rounded-lg bg-surface-container text-on-surface-variant hover:bg-primary/10 hover:text-primary text-xs font-bold transition-all">
-                    <Pencil className="h-3 w-3" /> Edit
+                <div className="flex gap-2 mt-auto">
+                  <button onClick={() => openEditModal(t)} className="flex items-center justify-center flex-1 gap-1 px-3 py-2.5 rounded-lg bg-surface-container text-on-surface hover:bg-primary/10 hover:text-primary text-xs font-bold transition-all shadow-sm">
+                    <Pencil className="h-3.5 w-3.5" /> Edit
                   </button>
                   <button 
                     onClick={() => handleDelete(t.id)}
-                    className="flex items-center gap-1 px-3 py-2 rounded-lg bg-surface-container text-on-surface-variant hover:bg-error/10 hover:text-error text-xs font-bold transition-all"
+                    className="flex items-center justify-center bg-surface-container hover:bg-error/10 hover:text-error text-on-surface-variant px-3 py-2.5 rounded-lg transition-all shadow-sm"
+                    title="Hapus Meja"
                   >
-                    <Trash2 className="h-3 w-3" /> Hapus
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
               </div>
-            </div>
+            </ScrollReveal>
           );
         })}
 
@@ -159,11 +164,12 @@ const ManageTablesPage = () => {
       </div>
 
       {/* Modal / Dialog */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={closeModal}></div>
-          <div className="relative w-full max-w-md card-elevated p-6 animate-in slide-in-from-bottom-8 fade-in-0 duration-300">
-            <div className="flex justify-between items-center mb-6">
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={closeModal}></motion.div>
+            <motion.div initial={{opacity:0, scale:0.95, y:20}} animate={{opacity:1, scale:1, y:0}} exit={{opacity:0, scale:0.95, y:20}} className="relative w-full max-w-md card-elevated p-6 shadow-[0_20px_60px_-15px_rgba(0,40,93,0.3)]">
+              <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-on-surface">
                 {editingId ? 'Edit Meja' : 'Tambah Meja Baru'}
               </h2>
@@ -207,9 +213,10 @@ const ManageTablesPage = () => {
                 </button>
               </div>
             </form>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 };

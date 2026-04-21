@@ -5,6 +5,7 @@ import * as bookingApi from '../../api/bookingApi';
 import * as paymentApi from '../../api/paymentApi';
 import { Loader2, ArrowLeft, Wallet, Building2, Smartphone } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 
 const CheckoutPage = () => {
   const { selectedTable, selectedDate, startTime, endTime, selectedPackage, totalPrice, resetBooking } = useBookingStore();
@@ -89,11 +90,16 @@ const CheckoutPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
         {/* Ringkasan */}
-        <div className="card-elevated p-6 md:p-8 relative overflow-hidden">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4 }}
+          className="card-elevated p-6 md:p-8 relative overflow-hidden"
+        >
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary-container"></div>
           <h2 className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-6">Ringkasan Pesanan</h2>
           
-          <div className="space-y-5 text-on-surface-variant">
+          <div className="space-y-5 text-on-surface-variant flex-1">
             {[
               { label: 'Meja', value: selectedTable.nama_meja || selectedTable.name },
               { label: 'Tanggal', value: formatDate(selectedDate) },
@@ -106,15 +112,19 @@ const CheckoutPage = () => {
               </div>
             ))}
 
-            <div className="border-t border-outline-variant/10 pt-5 flex justify-between items-center">
+            <div className="border-t border-outline-variant/10 pt-5 flex justify-between items-center mt-auto">
               <span className="font-bold text-lg text-on-surface">Total Harga</span>
               <span className="text-3xl font-black text-primary">Rp {totalPrice.toLocaleString('id-ID')}</span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Metode Pembayaran */}
-        <div>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
           <h2 className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-6">Metode Pembayaran</h2>
           <div className="space-y-3 mb-8">
             {payments.map(method => (
@@ -123,7 +133,7 @@ const CheckoutPage = () => {
                 onClick={() => setPaymentMethod(method.label)}
                 className={`flex items-center p-4 rounded-xl border cursor-pointer transition-all duration-300 group
                   ${paymentMethod === method.label 
-                    ? 'border-primary bg-primary/10 ring-1 ring-primary shadow-[0_0_15px_rgba(173,198,255,0.15)]' 
+                    ? 'border-primary bg-primary/10 ring-1 ring-primary shadow-[0_0_15px_rgba(173,198,255,0.15)] scale-[1.02]' 
                     : 'border-outline-variant/10 bg-surface-container-low hover:bg-surface-container-high'}`}
               >
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 transition-all
@@ -133,7 +143,7 @@ const CheckoutPage = () => {
                 <span className="font-bold text-on-surface">{method.label}</span>
                 <div className={`ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center
                   ${paymentMethod === method.label ? 'border-primary bg-primary' : 'border-outline'}`}>
-                  {paymentMethod === method.label && <div className="w-2 h-2 bg-on-primary-container rounded-full" />}
+                  {paymentMethod === method.label && <motion.div initial={{scale:0}} animate={{scale:1}} className="w-2 h-2 bg-on-primary-container rounded-full" />}
                 </div>
               </label>
             ))}
@@ -150,7 +160,7 @@ const CheckoutPage = () => {
               'KONFIRMASI BOOKING'
             )}
           </button>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import TimeSlotPicker from '../../components/booking/TimeSlotPicker';
 import PackageSelector from '../../components/booking/PackageSelector';
 import { ArrowLeft, ArrowRight, CheckCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const BookingPage = () => {
   const [step, setStep] = useState(1);
@@ -102,59 +103,79 @@ const BookingPage = () => {
       </div>
 
       {/* Content */}
-      <div className="card-elevated p-6 md:p-8 relative overflow-hidden">
+      <div className="card-elevated p-6 md:p-8 relative overflow-hidden min-h-[400px]">
         {/* Subtle background glow */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-0"></div>
         
-        <div className="relative z-10">
-          {step === 1 && (
-            <div>
-              <h2 className="text-2xl font-bold text-on-surface mb-2">Pilih Meja yang Tersedia</h2>
-              <p className="text-on-surface-variant text-sm mb-6">Meja dengan status hijau bisa langsung dipesan.</p>
-              
-              {loading ? (
-                <div className="flex flex-col items-center justify-center py-20 text-on-surface-variant">
-                  <Loader2 className="h-10 w-10 animate-spin mb-4 text-primary" />
-                  <p className="font-medium">Memuat data meja...</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {tables.map(t => (
-                    <TableCard key={t.id} table={t} selected={selectedTable?.id === t.id} onSelect={setTable} />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+        <div className="relative z-10 min-h-[300px]">
+          <AnimatePresence mode="wait">
+            {step === 1 && (
+              <motion.div 
+                key="step1"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-2xl font-bold text-on-surface mb-2">Pilih Meja yang Tersedia</h2>
+                <p className="text-on-surface-variant text-sm mb-6">Meja dengan status hijau bisa langsung dipesan.</p>
+                
+                {loading ? (
+                  <div className="flex flex-col items-center justify-center py-20 text-on-surface-variant">
+                    <Loader2 className="h-10 w-10 animate-spin mb-4 text-primary" />
+                    <p className="font-medium">Memuat data meja...</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {tables.map((t, idx) => (
+                      <TableCard key={t.id} table={t} selected={selectedTable?.id === t.id} onSelect={setTable} delay={idx * 0.05} />
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
 
-          {step === 2 && (
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-xl">🎱</div>
-                <div>
-                  <h2 className="text-2xl font-bold text-on-surface">{selectedTable.name}</h2>
-                  <p className="text-on-surface-variant text-sm">Pilih tanggal dan waktu bermain</p>
+            {step === 2 && (
+              <motion.div 
+                key="step2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="flex items-center gap-3 mb-6 bg-surface-container/50 p-4 rounded-xl border border-outline-variant/10">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-2xl animate-float">🎱</div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-on-surface">{selectedTable.name}</h2>
+                    <p className="text-on-surface-variant text-sm">Pilih tanggal dan waktu bermain</p>
+                  </div>
                 </div>
-              </div>
-              <TimeSlotPicker 
-                date={date} onDateChange={setDate}
-                startTime={time} onTimeChange={setTime}
-                duration={duration} onDurationChange={setDuration}
-              />
-            </div>
-          )}
+                <TimeSlotPicker 
+                  date={date} onDateChange={setDate}
+                  startTime={time} onTimeChange={setTime}
+                  duration={duration} onDurationChange={setDuration}
+                />
+              </motion.div>
+            )}
 
-          {step === 3 && (
-            <div>
-              <h2 className="text-2xl font-bold text-on-surface mb-2">Pilih Paket Anda</h2>
-              <p className="text-on-surface-variant text-sm mb-6">Paket hemat hanya muncul jika hari dan jam memenuhi kriteria.</p>
-              <PackageSelector 
-                date={date} startTime={time} duration={duration}
-                selectedPackage={selectedPackage}
-                onSelectPackage={(pkg) => setPackage(pkg, pkg.price)}
-              />
-            </div>
-          )}
+            {step === 3 && (
+              <motion.div 
+                key="step3"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-2xl font-bold text-on-surface mb-2">Pilih Paket Anda</h2>
+                <p className="text-on-surface-variant text-sm mb-6">Paket hemat hanya muncul jika hari dan jam memenuhi kriteria.</p>
+                <PackageSelector 
+                  date={date} startTime={time} duration={duration}
+                  selectedPackage={selectedPackage}
+                  onSelectPackage={(pkg) => setPackage(pkg, pkg.price)}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Navigation */}

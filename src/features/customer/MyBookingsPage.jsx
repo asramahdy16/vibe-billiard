@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as bookingApi from '../../api/bookingApi';
 import { CalendarCheck, ArrowRight, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ScrollReveal from '../../components/ui/ScrollReveal';
+import EmptyState from '../../components/ui/EmptyState';
 
 const MyBookingsPage = () => {
   const [bookings, setBookings] = React.useState([]);
@@ -74,11 +76,11 @@ const MyBookingsPage = () => {
       </div>
 
       <div className="space-y-4">
-        {bookings.map((bk) => (
-          <div key={bk.id} className="card-elevated p-5 md:p-6 group hover:shadow-[0_10px_30px_-10px_rgba(0,40,93,0.3)] transition-all duration-500">
+        {bookings.map((bk, idx) => (
+          <ScrollReveal direction="up" delay={idx * 0.1} key={bk.id} className="card-elevated p-5 md:p-6 group hover:shadow-[0_10px_30px_-10px_rgba(0,40,93,0.3)] transition-all duration-500">
             <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 border-b border-outline-variant/10 pb-4 mb-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-2xl">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                   🎱
                 </div>
                 <div>
@@ -108,15 +110,18 @@ const MyBookingsPage = () => {
                 <button onClick={() => handleCancel(bk.id)} className="btn-secondary !px-4 !py-2 text-xs hover:!bg-error/10 hover:!text-error hover:!border-error/20 transition-colors">Batalkan</button>
               </div>
             )}
-          </div>
+          </ScrollReveal>
         ))}
 
         {bookings.length === 0 && (
-          <div className="glass-panel rounded-2xl border border-outline-variant/10 text-center p-16">
-            <CalendarCheck className="h-16 w-16 text-on-surface-variant/30 mx-auto mb-4" />
-            <p className="text-on-surface-variant mb-4 text-lg">Belum ada riwayat pemesanan.</p>
-            <Link to="/booking" className="btn-primary inline-block">Mulai Booking</Link>
-          </div>
+          <EmptyState
+            icon={<CalendarCheck className="w-12 h-12 text-on-surface-variant/40" />}
+            title="Belum ada riwayat"
+            message="Kamu belum pernah memesan meja. Mulai booking pertamamu sekarang!"
+            action={
+              <Link to="/booking" className="btn-primary mt-4 inline-block">Mulai Booking</Link>
+            }
+          />
         )}
       </div>
     </div>

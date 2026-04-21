@@ -5,7 +5,16 @@ import { Menu, X } from 'lucide-react';
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { pathname } = useLocation();
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navLinks = [
     { label: 'Beranda', href: '#beranda' },
@@ -14,7 +23,7 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="fixed top-0 w-full z-50 glass-nav shadow-[0_20px_40px_-10px_rgba(0,40,93,0.4)]">
+    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'glass-nav shadow-[0_20px_40px_-10px_rgba(0,40,93,0.4)]' : 'bg-transparent py-2'}`}>
       <div className="flex justify-between items-center px-6 lg:px-8 h-16 w-full max-w-screen-2xl mx-auto">
         <Link to="/" className="text-xl font-black tracking-tighter text-on-surface uppercase">
           Vibe Billiard

@@ -105,9 +105,9 @@ const UserLayout = ({ children }) => {
         <div className="flex justify-around items-center h-16 px-2">
           {navItems.map(item => (
             <Link key={item.path} to={item.path}
-              className={`flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-2xl transition-all text-[10px] font-medium
+              className={`flex flex-col items-center justify-center gap-0.5 px-4 py-1.5 rounded-xl transition-all duration-200 active:scale-95 text-[10px] font-bold
                 ${(pathname === item.path || (item.path === '/booking' && pathname.startsWith('/booking')))
-                  ? 'bg-surface-container-low text-primary' : 'text-on-surface-variant'}`}>
+                  ? 'bg-primary/20 text-primary shadow-[0_0_15px_rgba(173,198,255,0.15)] ring-1 ring-primary/30' : 'text-on-surface-variant hover:text-on-surface'}`}>
               {item.icon}
               <span>{item.name}</span>
             </Link>

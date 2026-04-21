@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import * as packageApi from '../../api/packageApi';
 import toast from 'react-hot-toast';
 import { Pencil, AlertTriangle, Loader2, X } from 'lucide-react';
+import ScrollReveal from '../../components/ui/ScrollReveal';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const ManagePackagesPage = () => {
   const [packages, setPackages] = useState([]);
@@ -102,14 +104,14 @@ const ManagePackagesPage = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl">
-        {packages.map(pkg => {
+        {packages.map((pkg, idx) => {
           const isHemat = pkg.harga_flat !== null;
           const price = isHemat ? pkg.harga_flat : pkg.harga_per_jam;
           const unit = isHemat ? `/${pkg.durasi_min_jam} jam` : '/jam';
           const color = isHemat ? 'tertiary' : 'primary';
 
           return (
-            <div key={pkg.id} className="relative group">
+            <ScrollReveal delay={idx * 0.1} key={pkg.id} className="relative group">
               {/* Glow border */}
               <div className={`absolute -inset-1 rounded-2xl blur transition duration-500
                 ${color === 'tertiary' 
@@ -119,12 +121,12 @@ const ManagePackagesPage = () => {
               
               <div className={`relative h-full rounded-2xl p-8 border overflow-hidden
                 ${color === 'tertiary' 
-                  ? 'bg-surface-container-highest border-primary/20' 
-                  : 'bg-surface-container-high border-outline-variant/10'}`}>
+                  ? 'bg-surface-container-highest border-primary/20 shadow-[0_0_20px_rgba(74,225,118,0.2)]' 
+                  : 'bg-surface-container-high border-outline-variant/10 shadow-lg'}`}>
                 
                 {/* Best value badge */}
                 {isHemat && (
-                  <div className="absolute top-0 right-0 bg-tertiary text-on-tertiary text-[10px] font-black tracking-widest uppercase px-4 py-1 rounded-bl-xl rounded-tr-2xl">
+                  <div className="absolute top-0 right-0 bg-tertiary text-on-tertiary text-[10px] font-black tracking-widest uppercase px-4 py-1 rounded-bl-xl rounded-tr-2xl shadow-md">
                     Best Value
                   </div>
                 )}
@@ -132,7 +134,7 @@ const ManagePackagesPage = () => {
                 {/* Edit button */}
                 <button 
                   onClick={() => openEditModal(pkg)}
-                  className="absolute top-4 left-4 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container/50 text-on-surface-variant z-20 hover:text-primary hover:bg-primary/10 text-xs font-bold transition-all"
+                  className="absolute top-4 left-4 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container/80 text-on-surface-variant z-20 hover:text-primary hover:bg-primary/10 text-xs font-bold transition-all backdrop-blur-sm"
                 >
                   <Pencil className="h-3 w-3" /> Edit
                 </button>
@@ -141,7 +143,7 @@ const ManagePackagesPage = () => {
                   <p className={`uppercase text-[10px] tracking-widest font-bold mb-2 ${color === 'tertiary' ? 'text-tertiary' : 'text-on-surface-variant'}`}>
                     {isHemat ? 'Pilihan Pro' : 'Standar Terbaik'}
                   </p>
-                  <h2 className="text-3xl font-black text-on-surface mb-6">{pkg.nama_paket}</h2>
+                  <h2 className="text-3xl font-black text-on-surface mb-6 group-hover:scale-[1.02] transition-transform origin-left">{pkg.nama_paket}</h2>
                   
                   <div className="flex items-end gap-1 mb-8">
                     <span className={`text-5xl font-black ${color === 'tertiary' ? 'text-tertiary' : 'text-primary'}`}>
@@ -151,21 +153,21 @@ const ManagePackagesPage = () => {
                   </div>
 
                   {isHemat ? (
-                    <div className="space-y-2 text-sm text-on-surface-variant">
-                      <p className="flex items-center gap-2"><span className="text-tertiary">✓</span> Senin - Jumat</p>
-                      <p className="flex items-center gap-2"><span className="text-tertiary">✓</span> Pukul 08:00 - 17:00</p>
-                      <p className="flex items-center gap-2"><span className="text-tertiary">✓</span> Minimum {pkg.durasi_min_jam} jam</p>
+                    <div className="space-y-3 text-sm text-on-surface-variant font-medium">
+                      <p className="flex items-center gap-2 text-on-surface"><span className="text-tertiary">✓</span> Senin - Jumat</p>
+                      <p className="flex items-center gap-2 text-on-surface"><span className="text-tertiary">✓</span> Pukul 08:00 - 17:00</p>
+                      <p className="flex items-center gap-2 text-on-surface"><span className="text-tertiary">✓</span> Minimum {pkg.durasi_min_jam} jam</p>
                     </div>
                   ) : (
-                    <div className="space-y-2 text-sm text-on-surface-variant">
-                      <p className="flex items-center gap-2"><span className="text-tertiary">✓</span> Setiap Hari</p>
-                      <p className="flex items-center gap-2"><span className="text-tertiary">✓</span> Durasi Fleksibel</p>
-                      <p className="flex items-center gap-2"><span className="text-tertiary">✓</span> Jam Operasional Penuh</p>
+                    <div className="space-y-3 text-sm text-on-surface-variant font-medium">
+                      <p className="flex items-center gap-2 text-on-surface"><span className="text-tertiary">✓</span> Setiap Hari</p>
+                      <p className="flex items-center gap-2 text-on-surface"><span className="text-tertiary">✓</span> Durasi Fleksibel</p>
+                      <p className="flex items-center gap-2 text-on-surface"><span className="text-tertiary">✓</span> Jam Operasional Penuh</p>
                     </div>
                   )}
                 </div>
               </div>
-            </div>
+            </ScrollReveal>
           );
         })}
       </div>
@@ -179,11 +181,12 @@ const ManagePackagesPage = () => {
       </div>
 
       {/* Edit Modal */}
-      {isModalOpen && editingPackage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={closeModal}></div>
-          <div className="relative w-full max-w-md card-elevated p-6 animate-in slide-in-from-bottom-8 fade-in-0 duration-300">
-            <div className="flex justify-between items-center mb-6">
+      <AnimatePresence>
+        {isModalOpen && editingPackage && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={closeModal}></motion.div>
+            <motion.div initial={{opacity:0, scale:0.95, y:20}} animate={{opacity:1, scale:1, y:0}} exit={{opacity:0, scale:0.95, y:20}} className="relative w-full max-w-md card-elevated p-6 shadow-[0_20px_60px_-15px_rgba(0,40,93,0.3)]">
+              <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-on-surface">Edit Paket</h2>
               <button onClick={closeModal} className="p-2 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors">
                 <X className="w-5 h-5" />
@@ -246,9 +249,10 @@ const ManagePackagesPage = () => {
                 </button>
               </div>
             </form>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 };

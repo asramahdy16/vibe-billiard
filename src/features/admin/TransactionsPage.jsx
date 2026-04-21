@@ -2,6 +2,8 @@ import React from 'react';
 import * as paymentApi from '../../api/paymentApi';
 import toast from 'react-hot-toast';
 import { Search, CheckCircle, Loader2 } from 'lucide-react';
+import ScrollReveal from '../../components/ui/ScrollReveal';
+import AnimatedCounter from '../../components/ui/AnimatedCounter';
 
 const TransactionsPage = () => {
   const [payments, setPayments] = React.useState([]);
@@ -72,17 +74,17 @@ const TransactionsPage = () => {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <ScrollReveal className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         {statsSummary.map((s, i) => (
           <div key={i} className="card-elevated p-4 text-center">
             <p className="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1">{s.label}</p>
-            <p className={`text-3xl font-black ${s.color}`}>{s.value}</p>
+            <AnimatedCounter value={s.value} className={`text-3xl font-black ${s.color}`} />
           </div>
         ))}
-      </div>
+      </ScrollReveal>
 
       {/* Table */}
-      <div className="card-elevated overflow-hidden">
+      <ScrollReveal delay={0.2} direction="up" className="card-elevated overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-surface-container text-on-surface-variant border-b border-outline-variant/10">
@@ -130,7 +132,7 @@ const TransactionsPage = () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </ScrollReveal>
     </div>
   );
 };
